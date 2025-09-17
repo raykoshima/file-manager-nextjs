@@ -1,36 +1,144 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# File Management System
+
+A secure file management system built with Next.js that allows users to upload, manage, and share files with authentication and access control.
+
+## Features
+
+### Authentication
+- User registration and login
+- JWT-based authentication with HTTP-only cookies
+- Secure password hashing with bcrypt
+
+### File Management
+- **Upload files** (login required)
+  - Set expiration time (1 day, 3 days, 7 days, 30 days, or never)
+  - Make files public or private
+  - File size limit: 10MB
+- **View and download files**
+  - Public files accessible to everyone
+  - Private files only accessible to owner
+  - Restricted file types (.exe, .zip, etc.) require authentication
+- **File expiration**
+  - Automatic cleanup of expired files
+  - Default expiration: 7 days
+- **Access control**
+  - Non-logged users can only view/download public files
+  - Restricted file types require authentication
+  - File owners can delete their files
+
+### Security Features
+- File type restrictions for non-authenticated users
+- Automatic file expiration and cleanup
+- Secure file storage with unique filenames
+- Access control based on file ownership and public/private status
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes
+- **Database**: SQLite
+- **Authentication**: JWT with bcrypt
+- **File Storage**: Local filesystem
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
 
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd file-manage-system
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Start the development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Learn More
+### Database Setup
 
-To learn more about Next.js, take a look at the following resources:
+The SQLite database will be automatically created and initialized when you first run the application. The database file will be created at `uploads/database.sqlite`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## API Endpoints
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Authentication
+- `POST /api/auth/register` - Register a new user
+- `POST /api/auth/login` - Login user
+- `POST /api/auth/logout` - Logout user
+- `GET /api/auth/me` - Get current user info
 
-## Deploy on Vercel
+### File Management
+- `POST /api/files/upload` - Upload a file (requires authentication)
+- `GET /api/files` - Get user's files (requires authentication)
+- `GET /api/files/[id]` - View/download a file
+- `DELETE /api/files/[id]` - Delete a file (requires authentication)
+- `GET /api/public/files` - Get public files (no authentication required)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## File Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── app/
+│   ├── api/
+│   │   ├── auth/          # Authentication endpoints
+│   │   ├── files/         # File management endpoints
+│   │   └── public/        # Public file endpoints
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── components/
+│   ├── AuthModal.tsx      # Login/Register modal
+│   ├── FileManager.tsx    # Main file management component
+│   ├── FileUpload.tsx     # File upload form
+│   └── FileList.tsx       # File listing component
+└── lib/
+    ├── auth.ts            # Authentication utilities
+    ├── database.ts        # Database configuration
+    ├── fileUtils.ts       # File handling utilities
+    └── init.ts            # Database initialization
+```
+
+## Usage
+
+### For Logged-in Users
+1. **Upload Files**: Click "Upload Files" and select a file
+2. **Set Expiration**: Choose how long the file should be available (default: 7 days)
+3. **Make Public**: Check the box to make the file accessible to non-logged users
+4. **Manage Files**: View, download, or delete your files from the file list
+
+### For Non-logged Users
+1. **View Public Files**: Browse files marked as public by logged-in users
+2. **Download Files**: Download any public file (except restricted types)
+3. **Restricted Access**: Some file types (.exe, .zip, etc.) require authentication
+
+## Security Considerations
+
+- Files are stored with unique names to prevent conflicts
+- Expired files are automatically deleted
+- File type restrictions prevent unauthorized access to executable files
+- All file operations are validated and sanitized
+- Authentication tokens are stored in HTTP-only cookies
+
+## Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+JWT_SECRET=your-secret-key-here
+NODE_ENV=development
+```
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
